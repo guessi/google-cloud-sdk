@@ -252,11 +252,17 @@ def _AuthProvider(name='gcp'):
     if sdk_bin_path is None:
       log.error(SDK_BIN_PATH_NOT_FOUND)
       raise Error(SDK_BIN_PATH_NOT_FOUND)
+
+    # https://issuetracker.google.com/issues/67026404
+    CMD_ARGS = 'config config-helper --format=json'
+    if os.getenv('GCLOUD_CONFIGURATION'):
+      CMD_ARGS += ' --configuration={0}'.format(os.getenv('GCLOUD_CONFIGURATION'))
+
     cfg = {
         # Command for gcloud credential helper
         'cmd-path': os.path.join(sdk_bin_path, bin_name),
         # Args for gcloud credential helper
-        'cmd-args': 'config config-helper --format=json',
+        'cmd-args': CMD_ARGS,
         # JSONpath to the field that is the raw access token
         'token-key': '{.credential.access_token}',
         # JSONpath to the field that is the expiration timestamp
